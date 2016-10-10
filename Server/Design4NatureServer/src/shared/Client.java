@@ -70,8 +70,9 @@ public class Client implements Serializable {
                     Object data = reader.readObject();
                     object = new Message(this.clientID, (String) data);
                 } catch (IOException | ClassNotFoundException ex) {
-                    if(ex.getMessage().equals("Connection reset"))
+                    if (ex.getMessage().equals("Connection reset")) {
                         break;
+                    }
                     continue;
                 }
 

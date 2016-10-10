@@ -66,12 +66,19 @@ public class Map {
         }
 
         // Calucate the actual size of the map
-        mapWidth = high.X - low.X;
-        mapHeight = high.Y - low.Y;
+        mapWidth = (int) (high.X - low.X);
+        mapHeight = (int) (high.Y - low.Y);
 
-        // Add a border of 20px to the sides
-        mapWidth += 40;
-        mapHeight += 40;
+        // Get the highest and override the other
+        if (mapWidth > mapHeight) {
+            mapHeight = mapWidth;
+        } else {
+            mapWidth = mapHeight;
+        }
+
+        // Add a border of 10px to each side
+        mapWidth += 20;
+        mapHeight += 20;
     }
 
     private void calculateMapSize() {
@@ -112,9 +119,6 @@ public class Map {
      * @param canvas The GraphicsContext to draw on
      */
     public void draw(GraphicsContext canvas) {
-        float xMultiplier = canvasWidth / mapWidth;
-        float yMultiplier = canvasHeight / mapHeight;
-
         // Clear the canvas
         canvas.clearRect(0, 0, canvasWidth, canvasHeight);
 
@@ -130,15 +134,24 @@ public class Map {
             }
         }
 
+        // Draw a grid
+        canvas.setStroke(Color.LIGHTGRAY);
+        canvas.setLineWidth(1);
+        for (int i = 0; i < mapWidth; i++) {
+            drawLine(canvas, getPixel(new Point(i - mapWidth / 2, -mapHeight / 2)), getPixel(new Point(i - mapWidth / 2, mapHeight / 2)));
+            drawLine(canvas, getPixel(new Point(-mapWidth / 2, i - mapHeight / 2)), getPixel(new Point(mapWidth / 2, i - mapHeight / 2)));
+        }
+
         // Draw each player onto the canvas
         for (Player p : playerTracking) {
             canvas.setStroke(p.getColor());
+            canvas.setLineWidth(3);
 
             // Draw each position
             Point last = null;
             for (Point point : p.getPoints()) {
                 if (last != null) {
-                    drawLine(canvas, getPixel(smallest.absolute().add(last)), getPixel(smallest.absolute().add(point)));
+                    drawLine(canvas, getPixel(last), getPixel(point));
                 }
                 last = point;
             }
@@ -153,9 +166,12 @@ public class Map {
     }
 
     private Point getPixel(Point source) {
-        int stepWidth = canvasWidth / 2;
-        int stepHeight = canvasHeight / 2;
+        float stepWidth = /*canvasWidth*/ canvasHeight / mapWidth;
+        float stepHeight = canvasHeight / mapHeight;
 
-        return new Point(source.X * stepWidth, source.Y * stepHeight);
+        float centerX = canvasWidth / 2;
+        float centerY = canvasHeight / 2;
+
+        return new Point((int) (centerX + source.X * stepWidth), (int) (centerY + source.Y * stepHeight));
     }
 }

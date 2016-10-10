@@ -33,8 +33,8 @@ public class Player {
                 return;
             }
         }
-        path.add(new Point(x, y));
-        System.out.println(x + "," + y);
+        path.add(new Point(x, -y));
+        //System.out.println(x + "," + y);
     }
 
     public int getId() {

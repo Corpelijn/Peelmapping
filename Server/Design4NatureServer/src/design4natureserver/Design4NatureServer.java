@@ -76,8 +76,6 @@ public class Design4NatureServer extends Application {
                 int x = Integer.parseInt(xy[0]);
                 int y = Integer.parseInt(xy[1]);
 
-//                x -= 161000;
-//                y -= 384000;
                 boolean result = map.addPathToPlayer(msg.getSender(), x, y);
                 if (!result) {
                     map.addPlayer(msg.getSender());
@@ -96,6 +94,7 @@ public class Design4NatureServer extends Application {
         Canvas canv = new Canvas(1850, 1000);
         canvas = canv.getGraphicsContext2D();
         map = new Map((int) canv.getWidth(), (int) canv.getHeight());
+        map.draw(canvas);
         //drawShapes();
         root.getChildren().add(canv);
         //root.getChildren().add(btn);
