@@ -17,13 +17,21 @@
         android:layout_centerHorizontal="true"
         android:hint="IP address"/>
 
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_ip_address"
+        android:layout_centerHorizontal="true"
+        android:hint="Naam"/>
+
     <Button
-        android:id="@+id/btn_set_ip"
+        android:id="@+id/btn_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/et_ip_address"
+        android:layout_below="@id/et_name"
         android:layout_centerHorizontal="true"
-        android:text="Set IP address"/>
+        android:text="Start"/>
 
     <TextView
         android:id="@+id/tv_latitude"

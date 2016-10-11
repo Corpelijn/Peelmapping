@@ -26,6 +26,7 @@ public class PositionActivity extends AppCompatActivity {
     private final int SERVERPORT = 11000;
     private Socket socket;
     private String serverIp;
+    private String name;
 
     private TextView tvLongitude;
     private TextView tvLatitude;
@@ -38,6 +39,13 @@ public class PositionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_position);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Geen toegang tot GPS", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         tvLatitude = (TextView) findViewById(R.id.tv_latitude);
         tvLongitude = (TextView) findViewById(R.id.tv_longitude);
         tvError = (TextView) findViewById(R.id.tv_error);
@@ -47,42 +55,30 @@ public class PositionActivity extends AppCompatActivity {
                 .LOCATION_SERVICE);
 
         LocationListener locationListener = new MyLocationListener();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
 
-        }
 //        locationManager.requestLocationUpdates(KalmanLocationManager.UseProvider.GPS_AND_NET,
 //                100, 0, 0, locationListener, true);
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
                 locationListener);
 
-
         final EditText etIpAddress = (EditText) findViewById(R.id.et_ip_address);
-        final Button btnSetIpAddress = (Button) findViewById(R.id.btn_set_ip);
+        final EditText etName = (EditText) findViewById(R.id.et_name);
+        final Button btnStart = (Button) findViewById(R.id.btn_start);
+
         thread = new Thread(new ClientThread());
-        btnSetIpAddress.setOnClickListener(new View.OnClickListener() {
+        btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 serverIp = etIpAddress.getText().toString();
+                name = etName.getText().toString();
                 if (etIpAddress.isEnabled()) {
-                    Toast.makeText(PositionActivity.this, "IP Address set to " + serverIp, Toast
-                              .LENGTH_SHORT).show();
-
                     if (serverIp != null) {
                         thread.start();
                     }
-                    btnSetIpAddress.setText("Stop");
+                    btnStart.setText("Stop");
                     etIpAddress.setEnabled(false);
+                    etName.setEnabled(false);
                 }
                 else {
                     try {
@@ -93,8 +89,9 @@ public class PositionActivity extends AppCompatActivity {
                         tvError.setText(e.getMessage());
                         e.printStackTrace();
                     }
-                    btnSetIpAddress.setText("Start");
+                    btnStart.setText("Start");
                     etIpAddress.setEnabled(true);
+                    etName.setEnabled(true);
                 }
             }
         });
@@ -118,7 +115,7 @@ public class PositionActivity extends AppCompatActivity {
                     tvError.setText("");
                     Log.d("SOCKET", "sent location to server");
                 }
-            } catch (IOException e){
+            } catch (IOException e) {
                 tvError.setText(e.getMessage());
                 e.printStackTrace();
             }
@@ -145,6 +142,7 @@ public class PositionActivity extends AppCompatActivity {
                 InetAddress serverAddr = InetAddress.getByName(serverIp);
                 socket = new Socket(serverAddr, SERVERPORT);
                 out = new ObjectOutputStream(socket.getOutputStream());
+                out.writeObject(name);
             } catch (IOException e) {
                 e.printStackTrace();
             }
