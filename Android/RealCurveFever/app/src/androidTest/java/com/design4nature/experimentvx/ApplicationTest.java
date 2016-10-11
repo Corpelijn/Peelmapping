@@ -1,4 +1,4 @@
-package com.design4nature.realcurvefever;
+package com.design4nature.experimentvx;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

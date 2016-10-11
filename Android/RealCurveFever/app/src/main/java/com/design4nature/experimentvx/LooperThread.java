@@ -1,4 +1,4 @@
-package com.design4nature.realcurvefever;
+package com.design4nature.experimentvx;
 
 import android.content.Context;
 import android.location.Location;
@@ -11,8 +11,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 
-import static com.design4nature.realcurvefever.KalmanLocationManager.KALMAN_PROVIDER;
-import static com.design4nature.realcurvefever.KalmanLocationManager.UseProvider;
+import static com.design4nature.experimentvx.KalmanLocationManager.KALMAN_PROVIDER;
+import static com.design4nature.experimentvx.KalmanLocationManager.UseProvider;
 /**
  * Created by Ruben on 10-10-2016.
  * https://github.com/villoren/KalmanLocationManager
