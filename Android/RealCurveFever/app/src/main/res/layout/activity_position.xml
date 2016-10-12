@@ -33,21 +33,12 @@
         android:layout_centerHorizontal="true"
         android:text="Start"/>
 
-    <TextView
-        android:id="@+id/tv_latitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="Latitude"/>
-
-    <TextView
-        android:id="@+id/tv_longitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_latitude"
-        android:layout_centerHorizontal="true"
-        android:text="Longitude"/>
+    <ImageView
+        android:id="@+id/iv_map"
+        android:scaleType="centerInside"
+        android:layout_below="@id/btn_start"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <TextView
         android:id="@+id/tv_error"
@@ -56,4 +47,14 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:textColor="#FF0000"/>
+
+    <TextView
+        android:id="@+id/tv_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/tv_error"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="coordinates"/>
+
 </RelativeLayout>
