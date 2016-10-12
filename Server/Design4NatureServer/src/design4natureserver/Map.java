@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -222,8 +223,9 @@ public class Map {
      */
     public synchronized void draw() {
         // Clear the canvas
-        canvas.setFill(Color.BLACK);
-        canvas.fillRect(0, 0, canvasWidth, canvasHeight);
+//        canvas.setFill(Color.BLACK);
+//        canvas.fillRect(0, 0, canvasWidth, canvasHeight);
+        canvas.clearRect(0, 0, canvasWidth, canvasHeight);
 
         // Draw a grid
         if (drawGrid) {
@@ -247,13 +249,31 @@ public class Map {
 
             // Draw each position
             Point last = null;
+            int direction = 0;
             for (Point point : p.getPoints()) {
                 if (last != null) {
                     drawLine(canvas, getPixel(last), getPixel(point));
+
+                    Point dir = point.substract(last);
+                    if (dir.X > dir.Y && dir.X > 0) {
+                        direction = 1;
+                    } else if (dir.X < dir.Y && dir.X < 0) {
+                        direction = 3;
+                    } else if (dir.Y > dir.X && dir.Y > 0) {
+                        direction = 2;
+                    } else if (dir.Y < dir.X && dir.Y < 0) {
+                        direction = 0;
+                    }
                 }
                 last = point;
             }
+
+            drawSlug(canvas, p.getId() - 1, getPixel(last), direction);
         }
+    }
+
+    private void drawSlug(GraphicsContext canvas, int client, Point point, int direction) {
+        canvas.drawImage(new Image("/images/" + client + direction + ".png"), point.X - 15, point.Y - 15, 30, 30);
     }
 
     private void drawName(GraphicsContext canvas, String name, int height, Color color) {

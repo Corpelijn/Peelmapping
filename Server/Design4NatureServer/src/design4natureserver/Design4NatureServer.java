@@ -229,7 +229,6 @@ public class Design4NatureServer extends Application implements Listener {
             btn.setText("Kill " + player.getName());
             btn.setLayoutX(20);
             btn.setBackground(new Background(new BackgroundFill(player.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
-            //btn.setStyle("-fx-base: #" + String.format("#%02x%02x%02x", (int) player.getColor().getRed() * 255, (int) player.getColor().getGreen() * 255, (int) player.getColor().getBlue() * 255) + ";");
             btn.setLayoutY(5 + player.getId() * 30);
             btn.setOnAction(new EventHandler<ActionEvent>() {
 
