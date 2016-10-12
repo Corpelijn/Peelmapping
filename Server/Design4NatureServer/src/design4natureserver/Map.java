@@ -137,7 +137,7 @@ public class Map {
      * @param name The name of the player
      */
     public void addPlayer(int id, String name) {
-        Color[] colors = new Color[]{Color.RED, Color.DODGERBLUE, Color.LIME, Color.YELLOW, Color.MAGENTA};
+        Color[] colors = new Color[]{Color.RED, Color.CYAN, Color.LIME, Color.YELLOW, Color.MAGENTA};
         Player player = new Player(id, colors[playerTracking.size()], name);
         playerTracking.add(player);
 
