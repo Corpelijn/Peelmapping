@@ -6,6 +6,7 @@
 package shared;
 
 import design4nature.Server;
+import design4natureserver.Map;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,6 +15,8 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import javafx.application.Platform;
+import javafx.scene.paint.Color;
 
 /**
  *
@@ -55,7 +58,7 @@ public class Client implements Serializable {
         // The message now has a client name
         // Send the message
         try {
-            sender.writeObject(message);
+            sender.writeObject(message.getData());
         } catch (Exception ecx) {
             System.out.println(ecx.getMessage());
         }
@@ -83,13 +86,26 @@ public class Client implements Serializable {
                     continue;
                 }
 
-                if (name == null) {
-                    name = object.getData();
-                    System.out.println(name);
-                    continue;
-                }
-                Server.receivedMessages.add(object);
+                //if (name != null) {
                 //System.out.println("<" + name + ", " + this.clientID + "> " + object.getData());
+                //}
+                
+                if (object.getData().startsWith("n:")) {
+                    name = object.getData().replaceAll("n:", "");
+                    System.out.println("Client: " + name);
+                } else if (object.getData().startsWith("l:")) {
+                    object.setData(object.getData().replaceAll("l:", ""));
+                    Server.receivedMessages.add(object);
+                } else if (object.getData().equals("r:map")) {
+                    // Phone requests a map
+                    Platform.runLater(() -> {
+                        sendMessage(new Message(this, "m:" + Map.instance.getImage()));
+                    });
+                } else if (object.getData().equals("r:color")) {
+                    Color[] colors = new Color[]{Color.RED, Color.DODGERBLUE, Color.LIME, Color.YELLOW, Color.MAGENTA, Color.CYAN};
+                    Color color = colors[this.clientID - 1];
+                    sendMessage(new Message(this, String.format("c:#%02x%02x%02x", (int) color.getRed() * 255, (int) color.getGreen() * 255, (int) color.getBlue() * 255)));
+                }
 
                 //sendMessage(object);
                 try {

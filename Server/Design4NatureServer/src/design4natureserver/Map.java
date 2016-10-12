@@ -6,33 +6,48 @@
 package design4natureserver;
 
 import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import static java.lang.String.format;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javax.imageio.ImageIO;
 
 /**
  *
  * @author Bas
  */
 public class Map {
-    
+
     private int canvasWidth;
     private int canvasHeight;
-    
+
     private int mapWidth;
     private int mapHeight;
-    
+
     private Point correction;
     private boolean drawGrid;
-    
+
     private List<Player> playerTracking;
     private List<ClaimedArea> claimedArea;
-    
+
     private List<Listener> listeners;
+
+    public static Map instance;
+    private GraphicsContext canvas;
 
     /**
      * Creates a new instance of a map
@@ -41,16 +56,19 @@ public class Map {
      * @param canvasHeight The height of the canvas to draw on
      * @param grid Defines if the grid should be drawn
      */
-    public Map(int canvasWidth, int canvasHeight, boolean grid) {
+    public Map(int canvasWidth, int canvasHeight, GraphicsContext canvas, boolean grid) {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
         this.correction = null;
         this.drawGrid = grid;
         this.claimedArea = new ArrayList();
+        this.canvas = canvas;
+
+        instance = this;
 
         // Do a first calculation of the map size
         calculateMapSize(false);
-        
+
         playerTracking = new ArrayList();
         listeners = new ArrayList();
     }
@@ -116,10 +134,14 @@ public class Map {
      * Adds a player to the grid
      *
      * @param id The id of the player
+     * @param name The name of the player
      */
     public void addPlayer(int id, String name) {
-        Color[] colors = new Color[]{Color.RED, Color.LIGHTBLUE, Color.LIGHTGREEN, Color.YELLOW, Color.MAGENTA};
-        playerTracking.add(new Player(id, colors[playerTracking.size()], name));
+        Color[] colors = new Color[]{Color.RED, Color.DODGERBLUE, Color.LIME, Color.YELLOW, Color.MAGENTA};
+        Player player = new Player(id, colors[playerTracking.size()], name);
+        playerTracking.add(player);
+
+        onAddPlayer(player);
     }
 
     /**
@@ -139,17 +161,17 @@ public class Map {
             x -= correction.X;
             y -= correction.Y;
         }
-        
+
         boolean found = false;
         for (Player p : playerTracking) {
             if (p.getId() == player) {
                 found = true;
                 Point lastPointPlayer = p.getLastPosition();
-                
+
                 if (!p.addPlayerPosition(x, y)) {
                     break;
                 }
-                
+
                 boolean breakFor = false;
                 if (lastPointPlayer != null) {
                     for (Player allPlayers : playerTracking) {
@@ -178,28 +200,27 @@ public class Map {
 //                                }
 //                            }
                         }
-                        
+
                         if (breakFor) {
                             break;
                         }
                     }
                 }
-                
+
                 break;
             }
         }
-        
+
         calculateMapSize();
-        
+
         return found;
     }
 
     /**
      * Draws the current players onto the canvas
      *
-     * @param canvas The GraphicsContext to draw on
      */
-    public synchronized void draw(GraphicsContext canvas) {
+    public synchronized void draw() {
         // Clear the canvas
         canvas.setFill(Color.BLACK);
         canvas.fillRect(0, 0, canvasWidth, canvasHeight);
@@ -218,10 +239,10 @@ public class Map {
         int height = 0;
         for (Player p : playerTracking) {
             canvas.setStroke(p.getColor());
-            
-            drawName(canvas, p.getName(), height);
-            height += 20;
-            
+
+            drawName(canvas, p.getName(), height, p.getColor());
+            height += 30;
+
             canvas.setLineWidth(7);
 
             // Draw each position
@@ -234,10 +255,12 @@ public class Map {
             }
         }
     }
-    
-    private void drawName(GraphicsContext canvas, String name, int height) {
-        canvas.setLineWidth(1);
-        canvas.strokeText(name, 10, 50 + height);
+
+    private void drawName(GraphicsContext canvas, String name, int height, Color color) {
+        //canvas.setLineWidth(1);
+        canvas.setFill(color);
+        canvas.setFont(new Font("Tahoma", 25));
+        canvas.fillText(name, 20, 55 + height);
     }
 
     /**
@@ -263,10 +286,10 @@ public class Map {
     private Point getPixel(Point source) {
         float stepWidth = /*canvasWidth*/ canvasHeight / mapWidth;
         float stepHeight = canvasHeight / mapHeight;
-        
+
         float centerX = canvasWidth / 2;
         float centerY = canvasHeight / 2;
-        
+
         return new Point((int) (centerX + source.X * stepWidth), (int) (centerY + source.Y * stepHeight));
     }
 
@@ -293,19 +316,19 @@ public class Map {
 
         // 
         int err = dx - dy;
-        
+
         List<Point> points = new ArrayList();
-        
+
         while (true) {
             // Add the current point to the list
             points.add(new Point(x0, y0));
             for (int i = 0; i < lineWidth / 2; i++) {
                 points.add(new Point(x0 + sx * i, y0));
                 points.add(new Point(x0 - sx * i, y0));
-                
+
                 points.add(new Point(x0, y0 + sy * i));
                 points.add(new Point(x0, y0 - sy * i));
-                
+
                 points.add(new Point(x0 + sx * i, y0 + sy * i));
                 points.add(new Point(x0 - sx * i, y0 + sy * i));
                 points.add(new Point(x0 + sx * i, y0 - sy * i));
@@ -316,7 +339,7 @@ public class Map {
             if (x0 == x1 && y0 == y1) {
                 break;
             }
-            
+
             int e2 = 2 * err;
             if (e2 > -dy) {
                 err = err - dy;
@@ -327,9 +350,9 @@ public class Map {
                 y0 = y0 + sy;
             }
         }
-        
+
         Set<Point> uniquePoints = new HashSet<>(points);
-        
+
         return uniquePoints.toArray(new Point[uniquePoints.size()]);
     }
 
@@ -343,38 +366,58 @@ public class Map {
             listeners.add(l);
         }
     }
-    
+
     private void onCollision(PlayerCollision collision) {
         listeners.stream().forEach((l) -> {
             l.onCollision(collision);
         });
     }
-    
+
+    private void onAddPlayer(Player player) {
+        listeners.stream().forEach((l) -> {
+            l.onAddPlayer(player);
+        });
+    }
+
     public static int orientation(Point p, Point q, Point r) {
         double val = (q.Y - p.Y) * (r.X - q.X)
                 - (q.X - p.X) * (r.Y - q.Y);
-        
+
         if (val == 0.0) {
             return 0; // colinear
         }
         return (val > 0) ? 1 : 2; // clock or counterclock wise
     }
-    
+
     public static boolean intersect(Point p1, Point q1, Point p2, Point q2) {
-        
+
         if (q1 == p2) {
             return false;
         }
-        
+
         int o1 = orientation(p1, q1, p2);
         int o2 = orientation(p1, q1, q2);
         int o3 = orientation(p2, q2, p1);
         int o4 = orientation(p2, q2, q1);
-        
+
         if (o1 != o2 && o3 != o4) {
             return true;
         }
-        
+
         return false;
+    }
+
+    public String getImage() {
+        draw();
+        WritableImage image = canvas.getCanvas().snapshot(null, null);
+        BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+
+        ByteArrayOutputStream barray = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(bImage, "png", barray);
+        } catch (IOException ex) {
+        }
+
+        return Base64.getEncoder().encodeToString(barray.toByteArray());
     }
 }

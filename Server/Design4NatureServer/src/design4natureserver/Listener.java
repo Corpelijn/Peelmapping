@@ -12,4 +12,6 @@ package design4natureserver;
 public interface Listener {
 
     void onCollision(PlayerCollision collisionInfo);
+    
+    void onAddPlayer(Player player);
 }

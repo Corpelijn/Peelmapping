@@ -32,6 +32,7 @@ public class Design4NatureServer extends Application implements Listener {
     private int yp1 = -1;
     private int yp2 = -1;
     private Map map;
+    private Group root;
 
     @Override
     public void start(Stage primaryStage) {
@@ -39,16 +40,6 @@ public class Design4NatureServer extends Application implements Listener {
             new Server().start();
         });
         t.start();
-
-        Button btn = new Button();
-        btn.setText("Redraw");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                map.draw(canvas);
-            }
-        });
 
         Thread serverInput = new Thread(() -> {
             while (true) {
@@ -80,22 +71,24 @@ public class Design4NatureServer extends Application implements Listener {
 
                 //drawLineTo(msg.getSender(), x, y);
                 Platform.runLater(() -> {
-                    map.draw(canvas);
+                    map.draw();
                 });
             }
         });
         serverInput.start();
 
-        Group root = new Group();
+        root = new Group();
         Canvas canv = new Canvas(1850, 1000);
+        canv.setLayoutX(70);
         canvas = canv.getGraphicsContext2D();
-        map = new Map((int) canv.getWidth(), (int) canv.getHeight(), false);
+        map = new Map((int) canv.getWidth(), (int) canv.getHeight(), canvas, false);
         map.addListener(this);
-        map.draw(canvas);
+        map.draw();
         //drawShapes();
         root.getChildren().add(canv);
-        root.getChildren().add(btn);
-        primaryStage.setScene(new Scene(root));
+
+        primaryStage.setScene(new Scene(root, Color.BLACK));
+        primaryStage.setFullScreen(true);
         primaryStage.show();
     }
 
@@ -178,4 +171,22 @@ public class Design4NatureServer extends Application implements Listener {
         Server.killClient(collisionInfo.player.getId());
     }
 
+    @Override
+    public void onAddPlayer(Player player) {
+        Platform.runLater(() -> {
+            Button btn = new Button();
+            btn.setText("Kill " + player.getName());
+            btn.setLayoutY(5 + player.getId() * 30);
+            btn.setOnAction(new EventHandler<ActionEvent>() {
+
+                @Override
+                public void handle(ActionEvent event) {
+                    Server.killClient(player.getId());
+                    btn.setDisable(true);
+                }
+            });
+
+            root.getChildren().add(btn);
+        });
+    }
 }

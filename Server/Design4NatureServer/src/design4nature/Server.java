@@ -60,7 +60,7 @@ public class Server {
     }
 
     public static Message getNextReceivedMessage() {
-        if (receivedMessages.isEmpty()) {
+        if (receivedMessages == null || receivedMessages.isEmpty()) {
             return null;
         }
 
