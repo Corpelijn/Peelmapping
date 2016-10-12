@@ -44,7 +44,7 @@ public class Client {
 
     private void startMessageWriter() {
         Thread t = new Thread(() -> {
-            try {
+//            try {
 //                sender.writeObject("51.45178566,5.48224093");
 //                sender.writeObject("51.45178557,5.48223745");
 //                sender.writeObject("51.45178559,5.48223926");
@@ -203,15 +203,9 @@ public class Client {
 //                sender.writeObject("51.45141195,5.48293141");
 //                sender.writeObject("51.45141425,5.48295054");
 //                sender.writeObject("51.45141683,5.4829689");
-                
-                sender.writeObject("0,0");
-                sender.writeObject("1,1");
-                sender.writeObject("2,-1");
-                sender.writeObject("-1,1");
-                
-            } catch (IOException ex) {
-            }
 
+//            } catch (IOException ex) {
+//            }
             while (true) {
                 try {
                     Scanner input = new Scanner(System.in);

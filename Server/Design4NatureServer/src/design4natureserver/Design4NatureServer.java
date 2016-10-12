@@ -6,18 +6,29 @@
 package design4natureserver;
 
 import design4nature.Server;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import shared.Message;
 
 /**
@@ -32,7 +43,7 @@ public class Design4NatureServer extends Application implements Listener {
     private int yp1 = -1;
     private int yp2 = -1;
     private Map map;
-    private Group root;
+    private Group window2nd;
 
     @Override
     public void start(Stage primaryStage) {
@@ -77,9 +88,9 @@ public class Design4NatureServer extends Application implements Listener {
         });
         serverInput.start();
 
-        root = new Group();
-        Canvas canv = new Canvas(1850, 1000);
-        canv.setLayoutX(70);
+        Group root = new Group();
+        window2nd = new Group();
+        Canvas canv = new Canvas(1920, 1080);
         canvas = canv.getGraphicsContext2D();
         map = new Map((int) canv.getWidth(), (int) canv.getHeight(), canvas, false);
         map.addListener(this);
@@ -87,9 +98,49 @@ public class Design4NatureServer extends Application implements Listener {
         //drawShapes();
         root.getChildren().add(canv);
 
+        Canvas adminDraw = new Canvas(970, 540);
+        adminDraw.setLayoutX(100);
+        adminDraw.setLayoutY(20);
+        window2nd.getChildren().add(adminDraw);
+
+        new Thread(() -> {
+            while (true) {
+                Platform.runLater(() -> {
+                    WritableImage image = canv.snapshot(null, null);
+                    adminDraw.getGraphicsContext2D().drawImage(image, 0, 0, 970, 540);
+                });
+
+                try {
+                    Thread.sleep(800);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Design4NatureServer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }).start();
+
+        Stage secondStage = new Stage();
+
+        int index = 0;
+        for (Screen screen : Screen.getScreens()) {
+            Rectangle2D bounds = screen.getVisualBounds();
+
+            if (index == 0) {
+                primaryStage.setX(bounds.getMinX());
+                primaryStage.setY(bounds.getMinY());
+            } else if (index == 1) {
+                secondStage.setX(bounds.getMinX());
+                secondStage.setY(bounds.getMinY());
+            }
+            index++;
+        }
+
         primaryStage.setScene(new Scene(root, Color.BLACK));
-        primaryStage.setFullScreen(true);
+        primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
+
+        secondStage.setScene(new Scene(window2nd));
+        //secondStage.setMaximized(true);
+        secondStage.show();
     }
 
     private String d2xy(float lat, float lon) {
@@ -176,6 +227,9 @@ public class Design4NatureServer extends Application implements Listener {
         Platform.runLater(() -> {
             Button btn = new Button();
             btn.setText("Kill " + player.getName());
+            btn.setLayoutX(20);
+            btn.setBackground(new Background(new BackgroundFill(player.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+            //btn.setStyle("-fx-base: #" + String.format("#%02x%02x%02x", (int) player.getColor().getRed() * 255, (int) player.getColor().getGreen() * 255, (int) player.getColor().getBlue() * 255) + ";");
             btn.setLayoutY(5 + player.getId() * 30);
             btn.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -186,7 +240,7 @@ public class Design4NatureServer extends Application implements Listener {
                 }
             });
 
-            root.getChildren().add(btn);
+            window2nd.getChildren().add(btn);
         });
     }
 }
