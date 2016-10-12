@@ -20,11 +20,11 @@ import shared.*;
  */
 public class Server {
 
-    private final List<Client> connectedClients;
+    private static List<Client> connectedClients;
     public static List<Message> receivedMessages;
 
     public Server() {
-        this.connectedClients = new ArrayList<>();
+        connectedClients = new ArrayList<>();
         Server.receivedMessages = new ArrayList<>();
     }
 
@@ -71,5 +71,13 @@ public class Server {
         }
 
         return null;
+    }
+
+    public static void killClient(int id) {
+        for (Client c : connectedClients) {
+            if (c.getId() == id) {
+                c.killPlayer();
+            }
+        }
     }
 }

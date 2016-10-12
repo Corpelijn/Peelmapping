@@ -25,6 +25,8 @@ public class Client implements Serializable {
     private ObjectOutputStream sender;
     private ObjectInputStream reader;
     private int clientID;
+    private boolean kill;
+    private String name;
 
     private static int clientCounter = 0;
 
@@ -32,6 +34,8 @@ public class Client implements Serializable {
         this.socket = socket;
         clientCounter += 1;
         this.clientID = clientCounter;
+        kill = false;
+        name = null;
 
         try {
             sender = new ObjectOutputStream(this.socket.getOutputStream());
@@ -61,6 +65,9 @@ public class Client implements Serializable {
         Thread t = new Thread(() -> {
             while (true) {
                 Message object = null;
+                if (kill) {
+                    break;
+                }
                 try {
                     //System.out.println("ID: " + this.clientID);
                     if (reader == null) {
@@ -68,7 +75,7 @@ public class Client implements Serializable {
                     }
 
                     Object data = reader.readObject();
-                    object = new Message(this.clientID, (String) data);
+                    object = new Message(this, (String) data);
                 } catch (IOException | ClassNotFoundException ex) {
                     if (ex.getMessage().equals("Connection reset")) {
                         break;
@@ -76,8 +83,13 @@ public class Client implements Serializable {
                     continue;
                 }
 
+                if (name == null) {
+                    name = object.getData();
+                    System.out.println(name);
+                    continue;
+                }
                 Server.receivedMessages.add(object);
-                System.out.println("<" + object.getSender() + "> " + object.getData());
+                //System.out.println("<" + name + ", " + this.clientID + "> " + object.getData());
 
                 //sendMessage(object);
                 try {
@@ -88,5 +100,17 @@ public class Client implements Serializable {
             }
         });
         t.start();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void killPlayer() {
+        kill = true;
+    }
+
+    public int getId() {
+        return this.clientID;
     }
 }

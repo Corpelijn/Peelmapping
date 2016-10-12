@@ -14,18 +14,18 @@ import java.io.Serializable;
 public class Message implements Serializable {
 
     private String data;
-    private int sender;
+    private Client sender;
 
-    public Message(int sender, String data) {
+    public Message(Client sender, String data) {
         this.data = data;
         this.sender = sender;
     }
 
-    public int getSender() {
+    public Client getSender() {
         return this.sender;
     }
 
-    public void setSender(int sender) {
+    public void setSender(Client sender) {
         this.sender = sender;
     }
 

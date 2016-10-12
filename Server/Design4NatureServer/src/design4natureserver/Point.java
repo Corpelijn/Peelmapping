@@ -30,4 +30,9 @@ public class Point {
     public Point absolute() {
         return new Point(Math.abs(X), Math.abs(Y));
     }
+
+    @Override
+    public String toString() {
+        return "X=" + X + ",Y=" + Y;
+    }
 }

@@ -15,8 +15,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
@@ -26,7 +24,7 @@ import shared.Message;
  *
  * @author Bas
  */
-public class Design4NatureServer extends Application {
+public class Design4NatureServer extends Application implements Listener {
 
     private GraphicsContext canvas;
     private int xp1 = -1;
@@ -43,16 +41,12 @@ public class Design4NatureServer extends Application {
         t.start();
 
         Button btn = new Button();
-        btn.setText("Say 'Hello World'");
+        btn.setText("Redraw");
         btn.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
-                Message message = Server.getNextReceivedMessage();
-                if (message == null) {
-                    return;
-                }
-                System.out.println(message);
+                map.draw(canvas);
             }
         });
 
@@ -76,10 +70,12 @@ public class Design4NatureServer extends Application {
                 int x = Integer.parseInt(xy[0]);
                 int y = Integer.parseInt(xy[1]);
 
-                boolean result = map.addPathToPlayer(msg.getSender(), x, y);
+//                int x = Integer.parseInt(message[0]);
+//                int y = Integer.parseInt(message[1]);
+                boolean result = map.addPathToPlayer(msg.getSender().getId(), x, y);
                 if (!result) {
-                    map.addPlayer(msg.getSender());
-                    map.addPathToPlayer(msg.getSender(), x, y);
+                    map.addPlayer(msg.getSender().getId(), msg.getSender().getName());
+                    map.addPathToPlayer(msg.getSender().getId(), x, y);
                 }
 
                 //drawLineTo(msg.getSender(), x, y);
@@ -93,11 +89,12 @@ public class Design4NatureServer extends Application {
         Group root = new Group();
         Canvas canv = new Canvas(1850, 1000);
         canvas = canv.getGraphicsContext2D();
-        map = new Map((int) canv.getWidth(), (int) canv.getHeight());
+        map = new Map((int) canv.getWidth(), (int) canv.getHeight(), false);
+        map.addListener(this);
         map.draw(canvas);
         //drawShapes();
         root.getChildren().add(canv);
-        //root.getChildren().add(btn);
+        root.getChildren().add(btn);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
@@ -142,29 +139,6 @@ public class Design4NatureServer extends Application {
         return Y0 + a;
     }
 
-    private void drawShapes() {
-        canvas.setFill(Color.GREEN);
-        canvas.setStroke(Color.BLUE);
-        canvas.setLineWidth(1);
-        canvas.strokeLine(40, 10, 10, 40);
-        canvas.fillOval(10, 60, 30, 30);
-        canvas.strokeOval(60, 60, 30, 30);
-        canvas.fillRoundRect(110, 60, 30, 30, 10, 10);
-        canvas.strokeRoundRect(160, 60, 30, 30, 10, 10);
-        canvas.fillArc(10, 110, 30, 30, 45, 240, ArcType.OPEN);
-        canvas.fillArc(60, 110, 30, 30, 45, 240, ArcType.CHORD);
-        canvas.fillArc(110, 110, 30, 30, 45, 240, ArcType.ROUND);
-        canvas.strokeArc(10, 160, 30, 30, 45, 240, ArcType.OPEN);
-        canvas.strokeArc(60, 160, 30, 30, 45, 240, ArcType.CHORD);
-        canvas.strokeArc(110, 160, 30, 30, 45, 240, ArcType.ROUND);
-        canvas.fillPolygon(new double[]{10, 40, 10, 40},
-                new double[]{210, 210, 240, 240}, 4);
-        canvas.strokePolygon(new double[]{60, 90, 60, 90},
-                new double[]{210, 210, 240, 240}, 4);
-        canvas.strokePolyline(new double[]{110, 140, 110, 140},
-                new double[]{210, 210, 240, 240}, 4);
-    }
-
     private void drawLineTo(int sender, int x, int y) {
         Platform.runLater(() -> {
             if ((xp1 != -1 && sender == 1) || (xp2 != -1 && sender == 2)) {
@@ -196,6 +170,12 @@ public class Design4NatureServer extends Application {
      */
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public void onCollision(PlayerCollision collisionInfo) {
+        System.out.println(collisionInfo);
+        Server.killClient(collisionInfo.player.getId());
     }
 
 }
