@@ -114,6 +114,7 @@ public class PositionActivity extends AppCompatActivity implements StepListener,
                     etIpAddress.setEnabled(true);
                     etName.setEnabled(true);
                 }
+                
             }
         });
 
