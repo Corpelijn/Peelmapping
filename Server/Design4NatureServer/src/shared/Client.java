@@ -102,7 +102,7 @@ public class Client implements Serializable {
                         sendMessage(new Message(this, "m:" + Map.instance.getImage()));
                     });
                 } else if (object.getData().equals("r:color")) {
-                    Color[] colors = new Color[]{Color.RED, Color.DODGERBLUE, Color.LIME, Color.YELLOW, Color.MAGENTA, Color.CYAN};
+                    Color[] colors = new Color[]{Color.RED, Color.CYAN, Color.LIME, Color.YELLOW, Color.MAGENTA, Color.CYAN};
                     Color color = colors[this.clientID - 1];
                     sendMessage(new Message(this, String.format("c:#%02x%02x%02x", (int) color.getRed() * 255, (int) color.getGreen() * 255, (int) color.getBlue() * 255)));
                 }

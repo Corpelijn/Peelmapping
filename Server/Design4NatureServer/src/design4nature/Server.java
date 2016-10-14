@@ -6,9 +6,13 @@
 package design4nature;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +34,19 @@ public class Server {
 
     public void start() {
         try (ServerSocket listener = new ServerSocket(11000)) {
-            writeMessage("Server is online on IP: " + listener.getInetAddress());
+            //writeMessage("Server is online on IP: " + listener.getInetAddress());
+            writeMessage("Server is online on the following IP's: ");
+            Enumeration e = NetworkInterface.getNetworkInterfaces();
+            while (e.hasMoreElements()) {
+                NetworkInterface n = (NetworkInterface) e.nextElement();
+                Enumeration ee = n.getInetAddresses();
+                while (ee.hasMoreElements()) {
+                    InetAddress i = (InetAddress) ee.nextElement();
+                    if (Inet4Address.class == i.getClass()) {
+                        writeMessage(i.getHostAddress());
+                    }
+                }
+            }
 
             while (true) {
                 System.out.println("Waiting for clients to connect...");
