@@ -62,4 +62,42 @@ public class PQRS {
         y.S = S;
         return y;
     }
+
+    public static String d2xy(float lat, float lon) {
+        float tmplat = lat;
+        float tmplng = lon;
+        double X = Math.round(gps2X(tmplat, tmplng));
+        double Y = Math.round(gps2Y(tmplat, tmplng));
+        return 50.57 < tmplat && 53.63 > tmplat && 3.29 < tmplng && 7.58 > tmplng ? ((int) X + "," + (int) Y) : "buiten bereik";
+    }
+
+    private static double gps2X(double b, double c) {
+        double a = 0;
+
+        double lat0 = 52.1551744;
+        double lng0 = 5.38720621;
+        double X0 = 155000;
+
+        double dlat = 0.36 * (b - lat0);
+        double dlng = 0.36 * (c - lng0);
+        for (int i = 1; 10 > i; i++) {
+            a += PQRS.XpqR()[i].R * Math.pow(dlat, PQRS.XpqR()[i].p) * Math.pow(dlng, PQRS.XpqR()[i].q);
+        }
+        return X0 + a;
+    }
+
+    private static double gps2Y(double b, double c) {
+        double a = 0;
+
+        double lat0 = 52.1551744;
+        double lng0 = 5.38720621;
+        double Y0 = 463000;
+
+        double dlat = 0.36 * (b - lat0);
+        double dlng = 0.36 * (c - lng0);
+        for (int i = 1; 11 > i; i++) {
+            a += PQRS.YpqS()[i].S * Math.pow(dlat, PQRS.YpqS()[i].p) * Math.pow(dlng, PQRS.YpqS()[i].q);
+        }
+        return Y0 + a;
+    }
 }

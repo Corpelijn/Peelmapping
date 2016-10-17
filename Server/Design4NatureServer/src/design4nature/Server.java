@@ -89,10 +89,18 @@ public class Server {
         return null;
     }
 
+    public static void broadcast(Message message) {
+        for (Client client : connectedClients) {
+            if (client.isTabled()) {
+                client.sendMessage(message);
+            }
+        }
+    }
+
     public static void killClient(int id) {
         for (Client c : connectedClients) {
             if (c.getId() == id) {
-                c.killPlayer();
+                //c.killPlayer();
             }
         }
     }

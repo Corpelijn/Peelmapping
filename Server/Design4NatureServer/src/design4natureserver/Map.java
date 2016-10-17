@@ -5,21 +5,16 @@
  */
 package design4natureserver;
 
-import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import static java.lang.String.format;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -47,7 +42,7 @@ public class Map {
 
     private List<Listener> listeners;
 
-    public static Map instance;
+    private static Map instance;
     private GraphicsContext canvas;
 
     /**
@@ -55,17 +50,16 @@ public class Map {
      *
      * @param canvasWidth The width of the canvas to draw on
      * @param canvasHeight The height of the canvas to draw on
+     * @param canvas The canvas to draw on
      * @param grid Defines if the grid should be drawn
      */
-    public Map(int canvasWidth, int canvasHeight, GraphicsContext canvas, boolean grid) {
+    private Map(int canvasWidth, int canvasHeight, GraphicsContext canvas, boolean grid) {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
         this.correction = null;
         this.drawGrid = grid;
         this.claimedArea = new ArrayList();
         this.canvas = canvas;
-
-        instance = this;
 
         // Do a first calculation of the map size
         calculateMapSize(false);
@@ -171,41 +165,6 @@ public class Map {
 
                 if (!p.addPlayerPosition(x, y)) {
                     break;
-                }
-
-                boolean breakFor = false;
-                if (lastPointPlayer != null) {
-                    for (Player allPlayers : playerTracking) {
-                        // Check if there is any collision with any other player
-                        if (allPlayers.getId() != player) {
-//                            List<Point> playerPoints = allPlayers.getPoints();
-//                            for (int i = 0; i < playerPoints.size() - 1; i++) {
-//                                boolean result = intersect(playerPoints.get(i), playerPoints.get(i + 1), lastPointPlayer, new Point(x, y));
-//                                if (result) {
-//                                    onCollision(new PlayerCollision(p, allPlayers, playerPoints.get(i), playerPoints.get(i + 1), lastPointPlayer, new Point(x, y)));
-//                                    p.removeLast();
-//                                    breakFor = true;
-//                                    break;
-//                                }
-//                            }
-                        } // Check if there is a collision with the player itself
-                        else {
-//                            List<Point> playerPoints = allPlayers.getPoints();
-//                            for (int i = 0; i < playerPoints.size() - 2; i++) {
-//                                boolean result = intersect(playerPoints.get(i), playerPoints.get(i + 1), lastPointPlayer, new Point(x, y));
-//                                if (result) {
-//                                    onCollision(new PlayerCollision(p, allPlayers, playerPoints.get(i), playerPoints.get(i + 1), lastPointPlayer, new Point(x, y)));
-//                                    p.removeLast();
-//                                    breakFor = true;
-//                                    break;
-//                                }
-//                            }
-                        }
-
-                        if (breakFor) {
-                            break;
-                        }
-                    }
                 }
 
                 break;
@@ -314,69 +273,6 @@ public class Map {
     }
 
     /**
-     * Calculates the line between two points
-     *
-     * @param p0 The start point
-     * @param p1 The end point
-     * @return Returns an array of positions that form a line
-     */
-    private Point[] getBresenhamLine(Point p0, Point p1, int lineWidth) {
-        int x0 = p0.X;
-        int y0 = p0.Y;
-        int x1 = p1.X;
-        int y1 = p1.Y;
-
-        // Calculate the distance between the 2 points for x and y
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
-
-        // Define a direction to move
-        int sx = x0 < x1 ? 1 : -1;
-        int sy = y0 < y1 ? 1 : -1;
-
-        // 
-        int err = dx - dy;
-
-        List<Point> points = new ArrayList();
-
-        while (true) {
-            // Add the current point to the list
-            points.add(new Point(x0, y0));
-            for (int i = 0; i < lineWidth / 2; i++) {
-                points.add(new Point(x0 + sx * i, y0));
-                points.add(new Point(x0 - sx * i, y0));
-
-                points.add(new Point(x0, y0 + sy * i));
-                points.add(new Point(x0, y0 - sy * i));
-
-                points.add(new Point(x0 + sx * i, y0 + sy * i));
-                points.add(new Point(x0 - sx * i, y0 + sy * i));
-                points.add(new Point(x0 + sx * i, y0 - sy * i));
-                points.add(new Point(x0 - sx * i, y0 - sy * i));
-            }
-
-            // If the current point equals to the end position, break the loop
-            if (x0 == x1 && y0 == y1) {
-                break;
-            }
-
-            int e2 = 2 * err;
-            if (e2 > -dy) {
-                err = err - dy;
-                x0 = x0 + sx;
-            }
-            if (e2 < dx) {
-                err = err + dx;
-                y0 = y0 + sy;
-            }
-        }
-
-        Set<Point> uniquePoints = new HashSet<>(points);
-
-        return uniquePoints.toArray(new Point[uniquePoints.size()]);
-    }
-
-    /**
      * Adds a listener to the current map for collision events
      *
      * @param l The listener to add
@@ -439,5 +335,29 @@ public class Map {
         }
 
         return Base64.getEncoder().encodeToString(barray.toByteArray());
+    }
+
+    /**
+     * Create a new instance of a map
+     *
+     * @param canvas The canvas to draw on
+     * @param grid Defines if the grid needs to be drawn
+     * @return Returns true if the Map instance was created; otherwise false
+     */
+    public static boolean create(Canvas canvas, boolean grid) {
+        if (instance == null) {
+            instance = new Map((int) canvas.getWidth(), (int) canvas.getHeight(), canvas.getGraphicsContext2D(), grid);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Gets the current instance of the Map
+     *
+     * @return The current instance of the Map
+     */
+    public static Map instance() {
+        return instance;
     }
 }

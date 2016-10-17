@@ -24,8 +24,6 @@ public class Client {
     private ObjectOutputStream sender;
     private ObjectInputStream reader;
 
-    private int clientID = -1;
-
     public Client() {
     }
 
@@ -212,17 +210,12 @@ public class Client {
                     String newMessage = input.nextLine();
 
                     sender.writeObject(newMessage);
-                } catch (Exception ex) {
+
+                    Thread.sleep(10);
+                } catch (InterruptedException | IOException ex) {
                     System.out.println(ex.getMessage());
                 }
-
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-                }
             }
-
         });
         t.start();
     }
@@ -240,7 +233,7 @@ public class Client {
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(ex.getMessage());
                 }
             }
         });
@@ -250,12 +243,10 @@ public class Client {
     public void sendMessage(Message message) {
         try {
             sender.writeObject(message);
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 
-    public int getClientId() {
-        return this.clientID;
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
