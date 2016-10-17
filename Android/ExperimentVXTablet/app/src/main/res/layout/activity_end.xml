@@ -10,4 +10,120 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.design4nature.experimentvxtablet.EndActivity">
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <TextView
+            android:id="@+id/tv_winner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Team x heeft gewonnen!"
+            android:textSize="74sp"/>
+
+        <RelativeLayout
+            android:id="@+id/rl_winner_names"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/tv_winner"
+            android:layout_marginBottom="50dp">
+
+            <TextView
+                android:id="@+id/tv_winner_names"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textSize="50sp"
+                android:text="Naam 1 en Naam 2"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rl_winner_names"
+            android:layout_centerHorizontal="true"
+            android:text="2. Team y"
+            android:textSize="50sp"/>
+
+        <RelativeLayout
+            android:id="@+id/rl_second_names"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/tv_second"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/tv_second_names"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textSize="24sp"
+                android:text="Naam 1 en Naam 2"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_third"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rl_second_names"
+            android:layout_centerHorizontal="true"
+            android:text="3. Team z"
+            android:textSize="50sp"/>
+
+        <RelativeLayout
+            android:id="@+id/rl_third_names"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/tv_third"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/tv_third_names"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textSize="24sp"
+                android:text="Naam 1 en Naam 2"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_fourth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rl_third_names"
+            android:layout_centerHorizontal="true"
+            android:text="4. Team o"
+            android:textSize="50sp"/>
+
+        <RelativeLayout
+            android:id="@+id/rl_fourth_names"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/tv_fourth"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/tv_fourth_names"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textSize="24sp"
+                android:text="Naam 1 en Naam 2"/>
+        </RelativeLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rl_fourth_names"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="75dp"
+            android:onClick="restartGame"
+            android:text="Opnieuw!"/>
+    </RelativeLayout>
+
 </RelativeLayout>

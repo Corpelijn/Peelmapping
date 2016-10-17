@@ -18,27 +18,34 @@
         android:hint="IP address"/>
 
     <EditText
-        android:id="@+id/et_name"
+        android:id="@+id/et_teamname"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/et_ip_address"
         android:layout_centerHorizontal="true"
-        android:hint="Naam"/>
+        android:hint="Teamnaam"/>
+    <EditText
+        android:id="@+id/et_name1"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_teamname"
+        android:layout_centerHorizontal="true"
+        android:hint="Naam 1"/>
+    <EditText
+        android:id="@+id/et_name2"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_name1"
+        android:layout_centerHorizontal="true"
+        android:hint="Naam 2"/>
 
     <Button
         android:id="@+id/btn_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/et_name"
+        android:layout_below="@id/et_name2"
         android:layout_centerHorizontal="true"
         android:text="Start"/>
-
-    <ImageView
-        android:id="@+id/iv_map"
-        android:scaleType="centerInside"
-        android:layout_below="@id/btn_start"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
     <TextView
         android:id="@+id/tv_error"

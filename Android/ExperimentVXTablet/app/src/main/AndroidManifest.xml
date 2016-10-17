@@ -16,11 +16,6 @@
         <activity
             android:name=".DemoActivity"
             android:screenOrientation="landscape">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity
             android:name=".CountDownActivity"
@@ -31,9 +26,23 @@
             android:name=".SocketService"
             android:enabled="true"/>
 
-        <activity android:name=".GameActivity">
+        <activity
+            android:name=".GameActivity"
+            android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".EndActivity">
+        <activity
+            android:name=".EndActivity"
+            android:screenOrientation="landscape">
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:screenOrientation="landscape">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 
