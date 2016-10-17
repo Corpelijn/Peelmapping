@@ -28,7 +28,6 @@ public class Player {
     }
 
     public synchronized boolean addPlayerPosition(int x, int y) {
-        y = -y;
         if (path.size() > 0) {
             Point last = path.get(path.size() - 1);
             if (last.X == x && last.Y == y) {

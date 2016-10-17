@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="Design4NatureServer.jnlp">
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="Design4NatureClientTabled.jnlp">
   <information>
-    <title>Design4NatureServer</title>
+    <title>Design4NatureClientTabled</title>
     <vendor>Bas</vendor>
     <description>null</description>
     <offline-allowed/>
@@ -11,11 +11,11 @@
   </resources>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="Design4NatureServer.jar" size="109531" download="eager" />
+    <jar href="Design4NatureClientTabled.jar" size="104339" download="eager" />
   </resources>
-  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="Design4NatureServer" >
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="Design4NatureClientTabled" >
     <param name="requiredFXVersion" value="8.0+"/>
   </applet-desc>
-  <jfx:javafx-desc  width="800" height="600" main-class="design4natureserver.Design4NatureServer"  name="Design4NatureServer" />
+  <jfx:javafx-desc  width="800" height="600" main-class="design4natureclienttablet.Design4NatureClientTablet"  name="Design4NatureClientTabled" />
   <update check="always"/>
 </jnlp>

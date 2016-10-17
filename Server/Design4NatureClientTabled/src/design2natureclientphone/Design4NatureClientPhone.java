@@ -3,17 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package testclient;
+package design2natureclientphone;
 
 /**
  *
  * @author Bas
  */
-import java.io.IOException;
+public class Design4NatureClientPhone {
 
-public class Design4NatureClient {
-
-    public static void main(String[] args) throws IOException {
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        System.out.println("This is the PHONE!");
         new Client().start();
     }
+
 }

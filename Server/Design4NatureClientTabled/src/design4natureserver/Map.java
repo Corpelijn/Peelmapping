@@ -36,9 +36,9 @@ public class Map {
 
     private Point correction;
     private boolean drawGrid;
+    private boolean drawSlugs;
 
     private List<Player> playerTracking;
-    private List<ClaimedArea> claimedArea;
 
     private List<Listener> listeners;
 
@@ -58,7 +58,7 @@ public class Map {
         this.canvasHeight = canvasHeight;
         this.correction = null;
         this.drawGrid = grid;
-        this.claimedArea = new ArrayList();
+        this.drawSlugs = false;
         this.canvas = canvas;
 
         // Do a first calculation of the map size
@@ -148,14 +148,14 @@ public class Map {
      * @return Returns true if the player was found; otherwise false
      */
     public synchronized boolean addPathToPlayer(int player, int x, int y) {
-        if (correction == null) {
-            correction = new Point(x, y);
-            x = 0;
-            y = 0;
-        } else {
-            x -= correction.X;
-            y -= correction.Y;
-        }
+//        if (correction == null) {
+//            correction = new Point(x, y);
+//            x = 0;
+//            y = 0;
+//        } else {
+//            x -= correction.X;
+//            y -= correction.Y;
+//        }
 
         boolean found = false;
         for (Player p : playerTracking) {
@@ -204,7 +204,7 @@ public class Map {
             drawName(canvas, p.getName(), height, p.getColor());
             height += 30;
 
-            canvas.setLineWidth(7);
+            canvas.setLineWidth(3);
 
             // Draw each position
             Point last = null;
@@ -227,12 +227,14 @@ public class Map {
                 last = point;
             }
 
-            drawSlug(canvas, p.getId() - 1, getPixel(last), direction);
+            if (drawSlugs) {
+                drawSlug(canvas, p.getId(), getPixel(last), direction);
+            }
         }
     }
 
     private void drawSlug(GraphicsContext canvas, int client, Point point, int direction) {
-        canvas.drawImage(new Image("/images/" + client + direction + ".png"), point.X - 15, point.Y - 15, 30, 30);
+        canvas.drawImage(new Image("/Images/" + client + direction + ".png"), point.X - 11, point.Y - 11, 22, 22);
     }
 
     private void drawName(GraphicsContext canvas, String name, int height, Color color) {
@@ -359,5 +361,13 @@ public class Map {
      */
     public static Map instance() {
         return instance;
+    }
+
+    public void setGrid(boolean value) {
+        drawGrid = value;
+    }
+
+    public void setSlugs(boolean value) {
+        drawSlugs = value;
     }
 }

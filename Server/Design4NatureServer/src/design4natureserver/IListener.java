@@ -9,13 +9,7 @@ package design4natureserver;
  *
  * @author Bas
  */
-public class ClaimedArea {
-
-    public Point point;
-    public Player player;
-
-    public ClaimedArea(Point point, Player player) {
-        this.point = point;
-        this.player = player;
-    }
+public interface IListener {
+    void onReady();
+    void onKillPlayer();
 }

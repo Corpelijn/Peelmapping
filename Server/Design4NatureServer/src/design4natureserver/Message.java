@@ -1,11 +1,12 @@
+package design4natureserver;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package shared;
-
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  *
@@ -14,18 +15,18 @@ import java.io.Serializable;
 public class Message implements Serializable {
 
     private String data;
-    private Client sender;
+    private int sender;
 
-    public Message(Client sender, String data) {
+    public Message(int sender, String data) {
         this.data = data;
         this.sender = sender;
     }
 
-    public Client getSender() {
+    public int getSender() {
         return this.sender;
     }
 
-    public void setSender(Client sender) {
+    public void setSender(int sender) {
         this.sender = sender;
     }
 
@@ -36,4 +37,5 @@ public class Message implements Serializable {
     public void setData(String value) {
         this.data = value;
     }
+
 }
