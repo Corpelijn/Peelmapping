@@ -85,7 +85,7 @@ public class Server implements IListener {
 
     public static void broadcast(String message) {
         for (Client client : connectedClients) {
-            if (client.isTabled()) {
+            if (client.isTablet()) {
                 client.sendMessage(message);
             }
         }
@@ -125,11 +125,11 @@ public class Server implements IListener {
         // Check if 15 seconds have past
         Date currentTime = new Date();
         Calendar newTime = Calendar.getInstance();
-        newTime.add(Calendar.SECOND, 15);
+        newTime.add(Calendar.SECOND, 5);
 
         while (currentTime.before(newTime.getTime())) {
             currentTime = new Date();
-            System.out.println(currentTime);
+            //System.out.println(currentTime);
             try {
                 Thread.sleep(500);
             } catch (InterruptedException ex) {
@@ -148,7 +148,7 @@ public class Server implements IListener {
     @Override
     public void onKillPlayer() {
         for (Client client : connectedClients) {
-            if (!client.isTabled()) {
+            if (!client.isTablet()) {
                 if (client.isDead()) {
                     if (!killedClients.contains(client)) {
                         killedClients.add(client);
@@ -160,12 +160,22 @@ public class Server implements IListener {
         if (killedClients.size() >= connectedClients.size() / 2 - 1) {
             for (Client client : connectedClients) {
                 client.sendMessage("c:end");
-                for (Client c : connectedClients) {
-                    if (!c.isTabled()) {
-                        client.sendMessage("r:" + (connectedClients.size() / 2 - killedClients.indexOf(c)) + "," + c.toString());
-                    }
-                }
+                
             }
         }
+    }
+
+    public static int getClientID(int globalClientId) {
+        int amount = -1;
+        for (Client c : connectedClients) {
+            if (!c.isTablet()) {
+                amount++;
+            }
+            if (c.getId() == globalClientId) {
+                break;
+            }
+        }
+
+        return amount;
     }
 }

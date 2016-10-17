@@ -52,6 +52,10 @@ public class Player {
         return name;
     }
 
+    public void setName(String value) {
+        name = value;
+    }
+
     public synchronized List<Point> getPoints() {
         return path;
     }

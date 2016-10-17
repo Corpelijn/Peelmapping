@@ -32,4 +32,9 @@ public class Line {
     public Client getOwner() {
         return owner;
     }
+
+    @Override
+    public String toString() {
+        return "Start=" + start + ", End=" + end;
+    }
 }

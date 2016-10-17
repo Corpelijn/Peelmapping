@@ -6,6 +6,8 @@
 package design4natureserver;
 
 import static design4natureserver.Server.connectedClients;
+import static design4natureserver.Server.killedClients;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,7 +30,7 @@ public class Client extends DataProvider implements Serializable {
     private String name1;
     private String name2;
     private String teamname;
-    private boolean isTabled;
+    private boolean isTablet;
     private boolean isReady;
     private Point lastPosition;
     private boolean isDead;
@@ -42,10 +44,13 @@ public class Client extends DataProvider implements Serializable {
      */
     public Client(Socket socket) {
         this.socket = socket;
-        isTabled = false;
+        isTablet = false;
         isReady = false;
         isDead = false;
         lastPosition = new Point(-1, -1);
+
+        this.clientID = clientCounter;
+        clientCounter += 1;
 
         try {
             sender = new ObjectOutputStream(this.socket.getOutputStream());
@@ -85,78 +90,88 @@ public class Client extends DataProvider implements Serializable {
      * Start a new reader for the incomming messages
      */
     private void startMessageReader() {
-        Thread t = new Thread(() -> {
-            boolean kill = false;
-            while (true) {
-                // If the kill value is true, terminate the message reader
-                if (kill) {
-                    break;
-                }
+        Thread t = new Thread(new Runnable() {
 
-                // Read a new message
-                Message object;
-                try {
-                    if (reader == null) {
-                        System.out.println("Cannot start reading messages:\n\tThe reader is null");
+            @Override
+            public void run() {
+                boolean kill = false;
+                while (true) {
+                    // If the kill value is true, terminate the message reader
+                    if (kill) {
                         break;
-                    }
-
-                    object = new Message(this.clientID, (String) reader.readObject());
-                } catch (IOException | ClassNotFoundException ex) {
-                    if (ex.getMessage().equals("Connection reset")) {
-                        System.out.println("Cannot read messages:\n\tThe connection was reset");
-                        break;
-                    }
-                    continue;
-                }
-
-                //if (name != null) {
-                //System.out.println("<" + name + ", " + this.clientID + "> " + object.getData());
-                //}
-                // Check if the client is a viewer
-                if (object.getData().startsWith("tablet")) {
-                    isTabled = true;
-                    System.out.println("A tabled client connected");
-
-                    for (Client client : connectedClients) {
-                        if (!client.isTabled()) {
-                            Server.broadcast("p:" + client.getId() + "," + (client.getName() != null ? client.getName() : "") + "," + client.getColor());
+                    }   // Read a new message
+                    Message object;
+                    try {
+                        if (reader == null) {
+                            System.out.println("Cannot start reading messages:\n\tThe reader is null");
+                            break;
                         }
-                    }
-                } // Check if the client is a player
-                else if (object.getData().startsWith("phone")) {
-                    this.clientID = clientCounter;
-                    clientCounter += 1;
-                    System.out.println("A phone client connected (id:" + clientID + ")");
 
-                    for (Client client : connectedClients) {
-                        if (!client.isTabled()) {
-                            Server.broadcast("p:" + client.getId() + "," + (client.getName() != null ? client.getName() : "") + "," + client.getColor());
+                        object = new Message(Server.getClientID(clientID), (String) reader.readObject());
+                    } catch (IOException | ClassNotFoundException ex) {
+                        if (ex.getMessage() == null) {
+                            continue;
                         }
+                        if (ex.getMessage().equals("Connection reset")) {
+                            System.out.println("Cannot read messages:\n\tThe connection was reset");
+                            break;
+                        }
+                        continue;
                     }
-                } // The client notifies it is ready
-                else if (object.getData().startsWith("c:ready")) {
-                    isReady = true;
-                    // Trigger the onReady event for all the listeners
-                    triggerEvent(0);
-                } // Get the name of the phone player
-                else if (object.getData().startsWith("t:")) {
-                    String[] msg = object.getData().replaceAll("t:", "").split(",");
-                    teamname = msg[0];
-                    name1 = msg[1];
-                    name2 = msg[2];
-                    System.out.println("Client connected: " + teamname + "(" + name1 + "," + name2 + ")");
-                } // Get a GPS coordinate from the client
-                else if (object.getData().startsWith("l:")) {
-                    String message = convertMessage(object.getData());
-                    if (Server.gameStarted) {
-                        checkCollision(message);
+
+                    // Check if the client is a viewer
+                    if (object.getData().startsWith("tablet")) {
+                        isTablet = true;
+                        System.out.println("A tablet client connected (id:" + clientID + ")");
+
+                        for (Client client : connectedClients) {
+                            if (!client.isTablet()) {
+                                Server.broadcast("p:" + Server.getClientID(client.getId()) + "," + (client.getName() != null ? client.getName() : "") + "," + client.getColor());
+                            }
+                        }
+                    } // Check if the client is a player
+                    else if (object.getData().startsWith("phone")) {
+                        System.out.println("A phone client connected (id:" + clientID + ")");
+                    } // The client notifies it is ready
+                    else if (object.getData().startsWith("c:ready")) {
+                        isReady = true;
+                        System.out.println(clientID + ": ready");
+                        // Trigger the onReady event for all the listeners
+                        triggerEvent(0);
+                    } // Get the name of the phone player
+                    else if (object.getData().startsWith("t:")) {
+                        String[] msg = object.getData().replaceAll("t:", "").split(",");
+                        teamname = msg[0];
+                        name1 = msg[1];
+                        name2 = msg[2];
+                        System.out.println("Client connected: " + teamname + "(" + name1 + "," + name2 + ")");
+
+                        for (Client client : connectedClients) {
+                            if (!client.isTablet()) {
+                                Server.broadcast("p:" + Server.getClientID(client.getId()) + "," + (client.getName() != null ? client.getName() : "") + "," + client.getColor());
+                            }
+                        }
+                    } // Get a GPS coordinate from the client
+                    else if (object.getData().startsWith("l:")) {
+                        String message = convertMessage(object.getData());
+                        if (message == null) {
+                            continue;
+                        }
+                        if (Server.gameStarted) {
+                            checkCollision(message);
+                        }
+                        Server.broadcast(message);
+                    } else if (object.getData().equals("r:ranking")) {
+                        for (Client c : connectedClients) {
+                            if (!c.isTablet()) {
+                                Client.this.sendMessage("r:" + (connectedClients.size() / 2 - killedClients.indexOf(c)) + "," + c.toString());
+                            }
+                        }
+                    } // The client requests his color
+                    else if (object.getData().equals("r:color")) {
+                        Color color = Colors.getColor(Server.getClientID(clientID));
+                        sendMessage(String.format("c:#%02x%02x%02x", (int) color.getRed() * 255, (int) color.getGreen() * 255, (int) color.getBlue() * 255));
                     }
-                    Server.broadcast(message);
-                } // The client requests his color
-                else if (object.getData().equals("r:color")) {
-                    Color color = Colors.getColor(clientID);
-                    sendMessage(String.format("c:#%02x%02x%02x", (int) color.getRed() * 255, (int) color.getGreen() * 255, (int) color.getBlue() * 255));
                 }
             }
         });
@@ -204,7 +219,7 @@ public class Client extends DataProvider implements Serializable {
         }
 
         lastPosition = new Point(x, y);
-        message = "l:" + x + "," + y + "," + clientID;
+        message = "l:" + x + "," + y + "," + Server.getClientID(clientID);
         System.out.println(message);
 
         return message;
@@ -218,8 +233,8 @@ public class Client extends DataProvider implements Serializable {
         return this.clientID;
     }
 
-    public boolean isTabled() {
-        return isTabled;
+    public boolean isTablet() {
+        return isTablet;
     }
 
     public boolean isReady() {
@@ -227,7 +242,7 @@ public class Client extends DataProvider implements Serializable {
     }
 
     public String getColor() {
-        Color color = Colors.getColor(clientID);
+        Color color = Colors.getColor(Server.getClientID(clientID));
         return String.format("#%02x%02x%02x", (int) color.getRed() * 255, (int) color.getGreen() * 255, (int) color.getBlue() * 255);
     }
 
@@ -246,5 +261,9 @@ public class Client extends DataProvider implements Serializable {
 
     public boolean isDead() {
         return isDead;
+    }
+
+    public Point getLastPosition() {
+        return lastPosition;
     }
 }

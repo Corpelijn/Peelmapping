@@ -92,7 +92,7 @@ public class Client {
                             Map.instance().addPathToPlayer(Integer.parseInt(msg[2]), Integer.parseInt(msg[0]), Integer.parseInt(msg[1]));
                         } else if (message.startsWith("p:")) {
                             String[] msg = message.replaceAll("p:", "").split(",");
-                            Map.instance().addPlayer(Integer.parseInt(msg[0]), "name");
+                            Map.instance().addPlayer(Integer.parseInt(msg[0]), msg[1]);
                         }
                     } else {
                         object = (Message) data;
@@ -115,7 +115,7 @@ public class Client {
     public void sendMessage(Message message) {
         try {
             sender.writeObject(message);
-            System.out.println("send: " + message);
+            System.out.println("send -> " + message);
 
         } catch (IOException ex) {
             Logger.getLogger(Client.class
@@ -126,7 +126,7 @@ public class Client {
     public void sendMessage(String message) {
         try {
             sender.writeObject(message);
-            System.out.println("send: " + message);
+            System.out.println("send -> " + message);
 
         } catch (IOException ex) {
             Logger.getLogger(Client.class
