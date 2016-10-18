@@ -93,6 +93,8 @@ public class Client {
                         } else if (message.startsWith("p:")) {
                             String[] msg = message.replaceAll("p:", "").split(",");
                             Map.instance().addPlayer(Integer.parseInt(msg[0]), msg[1]);
+                        } else if (message.startsWith("c:start")) {
+                            Map.instance().clearField();
                         }
                     } else {
                         object = (Message) data;

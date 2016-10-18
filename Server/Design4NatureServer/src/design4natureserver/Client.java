@@ -7,7 +7,6 @@ package design4natureserver;
 
 import static design4natureserver.Server.connectedClients;
 import static design4natureserver.Server.killedClients;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -47,7 +46,7 @@ public class Client extends DataProvider implements Serializable {
         isTablet = false;
         isReady = false;
         isDead = false;
-        lastPosition = new Point(-1, -1);
+        lastPosition = null;
 
         this.clientID = clientCounter;
         clientCounter += 1;
@@ -164,13 +163,13 @@ public class Client extends DataProvider implements Serializable {
                     } else if (object.getData().equals("r:ranking")) {
                         for (Client c : connectedClients) {
                             if (!c.isTablet()) {
-                                Client.this.sendMessage("r:" + (connectedClients.size() / 2 - killedClients.indexOf(c)) + "," + c.toString());
+                                Client.this.sendMessage("r:" + (Server.getPhoneCount() - killedClients.indexOf(c)) + "," + c.toString());
                             }
                         }
                     } // The client requests his color
                     else if (object.getData().equals("r:color")) {
                         Color color = Colors.getColor(Server.getClientID(clientID));
-                        sendMessage(String.format("c:#%02x%02x%02x", (int) color.getRed() * 255, (int) color.getGreen() * 255, (int) color.getBlue() * 255));
+                        sendMessage(String.format("c:#%02x%02x%02x", (int) (color.getRed() * 255f), (int) (color.getGreen() * 255f), (int) (color.getBlue() * 255f)));
                     }
                 }
             }
@@ -178,10 +177,18 @@ public class Client extends DataProvider implements Serializable {
         t.start();
     }
 
-    private synchronized void checkCollision(String message) {
+    private void checkCollision(String message) {
         String[] msg = message.replaceAll("l:", "").split(",");
 
-        boolean collision = CollisionField.instance().checkCollisionAndAdd(new Line(this, lastPosition, new Point(Integer.parseInt(msg[0]), Integer.parseInt(msg[1]))));
+        Point newPoint = new Point(Integer.parseInt(msg[0]), Integer.parseInt(msg[1]));
+        if (lastPosition == null) {
+            lastPosition = newPoint;
+            return;
+        }
+
+        boolean collision = CollisionField.instance().checkCollisionAndAdd(new Line(clientID, lastPosition, newPoint));
+        //System.out.println("collision: " + collision);
+        lastPosition = newPoint;
         if (collision) {
             this.sendMessage("c:kill");
             isDead = true;
@@ -191,12 +198,39 @@ public class Client extends DataProvider implements Serializable {
 
     private static Point correction;
 
+    private String convertMessageDEBUG(String message) {
+        message += "," + Server.getClientID(clientID);
+
+        String[] msg = message.replaceAll("l:", "").split(",");
+        int x = Integer.parseInt(msg[0]);
+        int y = -Integer.parseInt(msg[1]);
+
+        if (correction == null) {
+            correction = new Point(x, y);
+            x = 0;
+            y = 0;
+        } else {
+            x -= correction.X;
+            y -= correction.Y;
+        }
+
+        if (lastPosition != null && x == lastPosition.X && y == lastPosition.Y) {
+            return null;
+        }
+
+        message = "l:" + x + "," + y + "," + Server.getClientID(clientID);
+
+        //System.out.println(message);
+        return message;
+    }
+
     private String convertMessage(String message) {
         // Get the Lat en Lon positions as local positions
         String[] msg = message.replaceAll("l:", "").split(",");
         float lat = Float.parseFloat(msg[0]);
         float lon = Float.parseFloat(msg[1]);
 
+        //System.out.println(message);
         String[] xy = PQRS.d2xy(lat, lon).split(",");
         if (xy[0].equals("buiten bereik")) {
             return "buiten bereik";
@@ -214,13 +248,12 @@ public class Client extends DataProvider implements Serializable {
             y -= correction.Y;
         }
 
-        if (x == lastPosition.X && y == lastPosition.Y) {
+        if (lastPosition != null && x == lastPosition.X && y == lastPosition.Y) {
             return null;
         }
 
-        lastPosition = new Point(x, y);
         message = "l:" + x + "," + y + "," + Server.getClientID(clientID);
-        System.out.println(message);
+        //System.out.println(message);
 
         return message;
     }
@@ -243,7 +276,7 @@ public class Client extends DataProvider implements Serializable {
 
     public String getColor() {
         Color color = Colors.getColor(Server.getClientID(clientID));
-        return String.format("#%02x%02x%02x", (int) color.getRed() * 255, (int) color.getGreen() * 255, (int) color.getBlue() * 255);
+        return String.format("#%02x%02x%02x", (int) (color.getRed() * 255f), (int) (color.getGreen() * 255f), (int) (color.getBlue() * 255f));
     }
 
     public void killPlayer() {

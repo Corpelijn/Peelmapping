@@ -1,6 +1,5 @@
 package design4natureserver;
 
-
 import javafx.scene.paint.Color;
 
 /*
@@ -14,7 +13,7 @@ import javafx.scene.paint.Color;
  */
 public class Colors {
 
-    private static Color[] colors = new Color[]{Color.RED, Color.CYAN, Color.LIME, Color.YELLOW, Color.MAGENTA, Color.CYAN};
+    private static Color[] colors = new Color[]{Color.RED, Color.CYAN, Color.LIME, Color.PURPLE, Color.MAGENTA};
 
     public static Color getColor(int client) {
         return colors[client];

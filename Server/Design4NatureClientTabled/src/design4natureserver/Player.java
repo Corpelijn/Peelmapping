@@ -40,6 +40,10 @@ public class Player {
         return true;
     }
 
+    public void clearPoints() {
+        path.clear();
+    }
+
     public int getId() {
         return playerId;
     }

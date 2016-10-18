@@ -13,9 +13,9 @@ public class Line {
 
     private Point start;
     private Point end;
-    private Client owner;
+    private int owner;
 
-    public Line(Client owner, Point start, Point end) {
+    public Line(int owner, Point start, Point end) {
         this.start = start;
         this.end = end;
         this.owner = owner;
@@ -29,7 +29,7 @@ public class Line {
         return end;
     }
 
-    public Client getOwner() {
+    public int getOwner() {
         return owner;
     }
 

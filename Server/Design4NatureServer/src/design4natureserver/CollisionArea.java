@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * This class check if any lines within the area collide with eachother
+ *
  * @author Bas
  */
 public class CollisionArea {
@@ -25,7 +26,8 @@ public class CollisionArea {
 
     /**
      * Adds a line to the collisionArea
-     * @param line The line object to add 
+     *
+     * @param line The line object to add
      */
     public void addLine(Line line) {
         lines.add(line);
@@ -33,13 +35,16 @@ public class CollisionArea {
 
     /**
      * Check if the given line collides with any of the lines in the area
+     *
      * @param line The line to check the collisions for
-     * @return Returns true if the line collides with any other line; otherwise false
+     * @return Returns true if the line collides with any other line; otherwise
+     * false
      */
     public boolean checkCollisionInArea(Line line) {
         for (Line currentLine : lines) {
             // Check if we need to skip the line (previous line needs to be skipped because there will always be a collision
-            if (currentLine.getOwner() == line.getOwner() && currentLine.getEnd() == line.getStart()) {
+            if (currentLine.getOwner() == line.getOwner()
+                    && currentLine.getEnd() == line.getStart()) {
                 continue;
             }
 
@@ -55,6 +60,7 @@ public class CollisionArea {
 
     /**
      * Checks if two lines collides somewhere
+     *
      * @param line1 The first line
      * @param line2 The second line
      * @return Returns true if the lines collide somewhere; otherwise false
@@ -67,29 +73,36 @@ public class CollisionArea {
         if (crossingPoint == null) {
             return false;
         } else {
-            return !isPointOnLine(new Vector2(line1.getStart()), new Vector2(line1.getEnd()), crossingPoint)
-                    && !isPointOnLine(new Vector2(line2.getStart()), new Vector2(line2.getEnd()), crossingPoint);
+            boolean l1 = isPointOnLine(new Vector2(line1.getStart()), new Vector2(line1.getEnd()), crossingPoint);
+            boolean l2 = isPointOnLine(new Vector2(line2.getStart()), new Vector2(line2.getEnd()), crossingPoint);
+            return l1 && l2;
         }
     }
 
     /**
      * Check if point C is somewhere on the line between A and B
+     *
      * @param A The first point of the line (start)
      * @param B The second point of the line (end)
-     * @param C The point to check if it is somewhere on the line between A and B
-     * @return Returns true is the point is somewhere on the line; otherwise false
+     * @param C The point to check if it is somewhere on the line between A and
+     * B
+     * @return Returns true is the point is somewhere on the line; otherwise
+     * false
      */
     private boolean isPointOnLine(Vector2 A, Vector2 B, Vector2 C) {
-        return A.substract(C).add(B.substract(C)) == A.substract(B);
+        return Vector2.distance(A, C) + Vector2.distance(B, C) == Vector2.distance(A, B);
     }
 
     /**
      * Gets the position on a 2D plane where two lines cross
+     *
      * @param ps1 The start position of the first line
      * @param pe1 The end position of the first line
      * @param ps2 The start position of the second line
      * @param pe2 The end position of the second line
-     * @return Returns the position on a 2D plane where the two lines cross. This crossing could be outside the point given. Returns null if the lines are parallel
+     * @return Returns the position on a 2D plane where the two lines cross.
+     * This crossing could be outside the point given. Returns null if the lines
+     * are parallel
      */
     private Vector2 lineIntersectionPoint(Vector2 ps1, Vector2 pe1, Vector2 ps2,
             Vector2 pe2) {

@@ -36,4 +36,10 @@ public class Vector2 {
     public Vector2 add(Vector2 value) {
         return new Vector2(this.x + value.x, this.y + value.y);
     }
+
+    public static float distance(Vector2 v1, Vector2 v2) {
+        Vector2 distance = v1.substract(v2);
+        float cLine = (float) Math.sqrt(distance.x * distance.x + distance.y * distance.y);
+        return cLine;
+    }
 }

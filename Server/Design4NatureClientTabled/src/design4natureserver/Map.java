@@ -144,6 +144,13 @@ public class Map {
 
         onAddPlayer(player);
     }
+    
+    public void clearField()
+    {
+        for (Player p : playerTracking) {
+            p.clearPoints();
+        }
+    }
 
     /**
      * Adds a position to a player
@@ -234,7 +241,7 @@ public class Map {
             }
 
             if (drawSlugs) {
-                drawSlug(canvas, p.getId(), getPixel(last), direction);
+                //drawSlug(canvas, p.getId(), getPixel(last), direction);
             }
         }
     }

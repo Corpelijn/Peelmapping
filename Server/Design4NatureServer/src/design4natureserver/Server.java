@@ -125,7 +125,7 @@ public class Server implements IListener {
         // Check if 15 seconds have past
         Date currentTime = new Date();
         Calendar newTime = Calendar.getInstance();
-        newTime.add(Calendar.SECOND, 5);
+        newTime.add(Calendar.SECOND, 15);
 
         while (currentTime.before(newTime.getTime())) {
             currentTime = new Date();
@@ -157,10 +157,17 @@ public class Server implements IListener {
             }
         }
 
-        if (killedClients.size() >= connectedClients.size() / 2 - 1) {
+        if (killedClients.size() >= getPhoneCount() - 1) {
+            for (Client client : connectedClients) {
+                if (!client.isTablet()) {
+                    if (!killedClients.contains(client)) {
+                        killedClients.add(client);
+                    }
+                }
+            }
             for (Client client : connectedClients) {
                 client.sendMessage("c:end");
-                
+
             }
         }
     }
@@ -176,6 +183,16 @@ public class Server implements IListener {
             }
         }
 
+        return amount;
+    }
+
+    public static int getPhoneCount() {
+        int amount = 0;
+        for (Client client : connectedClients) {
+            if (!client.isTablet()) {
+                amount++;
+            }
+        }
         return amount;
     }
 }

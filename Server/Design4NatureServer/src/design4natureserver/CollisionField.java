@@ -39,7 +39,7 @@ public class CollisionField {
      * @param line The line to check the collisions for
      * @return Returns true if there is a collision somewhere; otherwise false
      */
-    public synchronized boolean checkCollisionAndAdd(Line line) {
+    public boolean checkCollisionAndAdd(Line line) {
         boolean result = checkCollision(line);
 
         if (isInNW(line)) {
@@ -103,7 +103,7 @@ public class CollisionField {
             return true;
         }
 
-        return line.getEnd().X <= 0 && line.getStart().Y <= 0;
+        return line.getEnd().X <= 0 && line.getEnd().Y <= 0;
     }
 
     /**
@@ -117,7 +117,7 @@ public class CollisionField {
             return true;
         }
 
-        return line.getEnd().X >= 0 && line.getStart().Y <= 0;
+        return line.getEnd().X >= 0 && line.getEnd().Y <= 0;
     }
 
     /**
@@ -131,7 +131,7 @@ public class CollisionField {
             return true;
         }
 
-        return line.getEnd().X <= 0 && line.getStart().Y >= 0;
+        return line.getEnd().X <= 0 && line.getEnd().Y >= 0;
     }
 
     /**
@@ -145,7 +145,7 @@ public class CollisionField {
             return true;
         }
 
-        return line.getEnd().X >= 0 && line.getStart().Y >= 0;
+        return line.getEnd().X >= 0 && line.getEnd().Y >= 0;
     }
 
     /**
@@ -153,7 +153,7 @@ public class CollisionField {
      *
      * @return The static instance of this class
      */
-    public synchronized static CollisionField instance() {
+    public static CollisionField instance() {
         if (instance == null) {
             instance = new CollisionField();
         }
