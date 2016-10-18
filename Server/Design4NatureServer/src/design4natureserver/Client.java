@@ -178,7 +178,7 @@ public class Client extends DataProvider implements Serializable {
         t.start();
     }
 
-    private void checkCollision(String message) {
+    private synchronized void checkCollision(String message) {
         String[] msg = message.replaceAll("l:", "").split(",");
 
         boolean collision = CollisionField.instance().checkCollisionAndAdd(new Line(this, lastPosition, new Point(Integer.parseInt(msg[0]), Integer.parseInt(msg[1]))));

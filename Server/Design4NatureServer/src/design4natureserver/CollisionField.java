@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * This class provides collision checks for all the lines in the game field.
+ *
  * @author Bas
  */
 public class CollisionField {
@@ -32,11 +33,13 @@ public class CollisionField {
     }
 
     /**
-     * Checks if there is a collision somewhere on the field and add the line to the field
+     * Checks if there is a collision somewhere on the field and add the line to
+     * the field
+     *
      * @param line The line to check the collisions for
      * @return Returns true if there is a collision somewhere; otherwise false
      */
-    public boolean checkCollisionAndAdd(Line line) {
+    public synchronized boolean checkCollisionAndAdd(Line line) {
         boolean result = checkCollision(line);
 
         if (isInNW(line)) {
@@ -56,7 +59,9 @@ public class CollisionField {
     }
 
     /**
-     * Check if there is a collision with the given line with some other line somewhere on the field
+     * Check if there is a collision with the given line with some other line
+     * somewhere on the field
+     *
      * @param line The line to check the collision for
      * @return Returns true if the line collides somewhere; otherwise false
      */
@@ -79,8 +84,9 @@ public class CollisionField {
         // Loop through all the areas we need to check
         for (CollisionArea area : directions) {
             boolean result = area.checkCollisionInArea(line);
-            if(result)
+            if (result) {
                 return true;
+            }
         }
 
         return false;
@@ -88,6 +94,7 @@ public class CollisionField {
 
     /**
      * Checks if the given line is in the NW area of the field
+     *
      * @param line The line to check
      * @return Returns true if the line is in the nW area; otherwise false
      */
@@ -101,6 +108,7 @@ public class CollisionField {
 
     /**
      * Checks if the given line is in the NE area of the field
+     *
      * @param line The line to check
      * @return Returns true if the line is in the NE area; otherwise false
      */
@@ -114,6 +122,7 @@ public class CollisionField {
 
     /**
      * Checks if the given line is in the SW area of the field
+     *
      * @param line The line to check
      * @return Returns true if the line is in the SW area; otherwise false
      */
@@ -127,6 +136,7 @@ public class CollisionField {
 
     /**
      * Checks if the given line is in the SE area of the field
+     *
      * @param line The line to check
      * @return Returns true if the line is in the SE area; otherwise false
      */
@@ -140,9 +150,10 @@ public class CollisionField {
 
     /**
      * Returns the static instance of the CollisionField class
+     *
      * @return The static instance of this class
      */
-    public static CollisionField instance() {
+    public synchronized static CollisionField instance() {
         if (instance == null) {
             instance = new CollisionField();
         }
