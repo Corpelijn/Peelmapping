@@ -83,7 +83,7 @@ public class Server implements IListener {
         System.out.println(message);
     }
 
-    public static void broadcast(String message) {
+    public synchronized static void broadcast(String message) {
         for (Client client : connectedClients) {
             if (client.isTablet()) {
                 client.sendMessage(message);
@@ -118,8 +118,17 @@ public class Server implements IListener {
         // When all clients are ready, disable the possibility to let new clients connect
         canConnect = false;
         // Send a message to all clients to start the intro video
-        for (Client client : Server.connectedClients) {
-            client.sendMessage("c:ready");
+        boolean allSend = false;
+        while (!allSend) {
+            try {
+                for (Client client : Server.connectedClients) {
+                    client.sendMessage("c:ready");
+                    System.out.println(client.getId() + ": ready signal");
+                    client.sendMessage("c:ready");
+                }
+                allSend = true;
+            } catch (Exception ex) {
+            }
         }
 
         // Check if 15 seconds have past
@@ -138,8 +147,18 @@ public class Server implements IListener {
         }
 
         // If the countdown is finished send the message start
-        for (Client client : Server.connectedClients) {
-            client.sendMessage("c:start");
+        allSend = false;
+        while (!allSend) {
+            try {
+                for (Client client : Server.connectedClients) {
+                    client.sendMessage("c:start");
+                    System.out.println(client.getId() + ": start signal");
+                    client.sendMessage("c:start");
+                }
+                allSend = true;
+            } catch (Exception ex) {
+
+            }
         }
 
         gameStarted = true;
@@ -194,5 +213,14 @@ public class Server implements IListener {
             }
         }
         return amount;
+    }
+
+    public static void teminateClient(Client client) {
+        System.out.println("terminate: " + client.getId());
+        client.terminate();
+        client.dispose();
+        connectedClients.remove(client);
+
+        System.gc();
     }
 }

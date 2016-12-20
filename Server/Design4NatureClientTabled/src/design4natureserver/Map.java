@@ -138,7 +138,7 @@ public class Map {
                 return;
             }
         }
-        Color[] colors = new Color[]{Color.RED, Color.CYAN, Color.LIME, Color.YELLOW, Color.MAGENTA};
+        Color[] colors = new Color[]{Color.RED, Color.CYAN, Color.LIME, Color.PURPLE, Color.MAGENTA};
         Player player = new Player(id, colors[playerTracking.size()], name);
         playerTracking.add(player);
 
@@ -241,7 +241,7 @@ public class Map {
             }
 
             if (drawSlugs) {
-                //drawSlug(canvas, p.getId(), getPixel(last), direction);
+                drawSlug(canvas, p.getId(), getPixel(last), direction);
             }
         }
     }

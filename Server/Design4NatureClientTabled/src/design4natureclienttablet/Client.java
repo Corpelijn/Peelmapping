@@ -83,9 +83,10 @@ public class Client {
                 Message object = null;
                 try {
                     Object data = reader.readObject();
+                    System.out.println(data.toString());
 
                     if (data instanceof String) {
-                        System.out.println(data.toString());
+
                         String message = data.toString();
                         if (message.startsWith("l:")) {
                             String[] msg = message.replaceAll("l:", "").split(",");
@@ -100,7 +101,8 @@ public class Client {
                         object = (Message) data;
                     }
 
-                } catch (IOException | ClassNotFoundException ex) {
+                } catch (IOException | ClassNotFoundException | NumberFormatException ex) {
+                    System.out.println(ex.getMessage());
                     continue;
                 }
 

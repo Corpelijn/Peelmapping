@@ -40,7 +40,7 @@ public class CollisionArea {
      * @return Returns true if the line collides with any other line; otherwise
      * false
      */
-    public boolean checkCollisionInArea(Line line) {
+    public synchronized boolean checkCollisionInArea(Line line) {
         for (Line currentLine : lines) {
             // Check if we need to skip the line (previous line needs to be skipped because there will always be a collision
             if (currentLine.getOwner() == line.getOwner()
